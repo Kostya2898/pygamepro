@@ -9,7 +9,8 @@ GROUND_OFFSET = 320  # Земля на 320 пікселів вище
 GRAVITY = 0.5
 JUMP_POWER = -10
 PLAYER_SPEED = 6  # Збільшена швидкість руху гравця
-MAX_PLAYER_X = 200000  # Збільшена межа руху гравця
+MAX_PLAYER_X = 2000  # Обмеження на рух гравця до 2000 пікселів
+MIN_PLAYER_X = 0  # Мінімум руху гравця (ліва межа)
 
 # Створення вікна гри
 window = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.RESIZABLE)
@@ -88,18 +89,16 @@ while running:
     else:
         # Масштабуємо фон
         background = scale_background(game_bg)
-        if player.x > 400:
-            background2 = scale_background(game_bg)
         flipped_background = flip_background(background)  # Відзеркалений фон
 
         # Обчислюємо бажану позицію камери
         target_camera_x = player.centerx - WINDOW_WIDTH // 2
-        target_camera_x = max(0, min(target_camera_x, MAX_PLAYER_X - WINDOW_WIDTH))
+        target_camera_x = max(MIN_PLAYER_X, min(target_camera_x, MAX_PLAYER_X - WINDOW_WIDTH))
 
         # Плавно рухаємо камеру до бажаної позиції
         camera_x += (target_camera_x - camera_x) * camera_speed
 
-        # Відображаємо фон (основний, ліворуч та праворуч)
+        # Відображаємо фон (основний та відзеркалений)
         window.blit(background, (-camera_x, 0))
         window.blit(flipped_background, (window.get_width() - camera_x, 0))
 
@@ -120,7 +119,6 @@ while running:
             player.x -= PLAYER_SPEED
         if keys[pygame.K_d] and player.right < MAX_PLAYER_X:  # Максимум MAX_PLAYER_X для правого руху
             player.x += PLAYER_SPEED
-        
 
         # Малювання гравця
         window.blit(player_image, (player.x - camera_x, player.y))
